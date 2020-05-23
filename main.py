@@ -4,18 +4,15 @@ from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
 
 
-class CalcApp(App):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+class MainApp(App):
+    def build(self):
+        self.operators = ["/", "*", "+", "-"]
+        self.last_was_operator = None
+        self.last_button = None
+        main_layout = BoxLayout(orientation="vertical")
         self.solution = TextInput(
             multiline=False, readonly=True, halign="right", font_size=55
         )
-        self.last_button = None
-        self.last_operator = None
-        self.operators = ["/", "*", "+", "-"]
-
-    def build(self):
-        main_layout = BoxLayout(orientation="vertical")
         main_layout.add_widget(self.solution)
         buttons = [
             ["7", "8", "9", "/"],
@@ -50,9 +47,8 @@ class CalcApp(App):
             # Clear the solution widget
             self.solution.text = ""
         else:
-            if current and (
-                    self.last_operator and button_text in self.operators):
-                # No two operators right after each other
+            if current and (self.last_was_operator and button_text in self.operators):
+                # Don't add two operators right after each other
                 return
             elif current == "" and button_text in self.operators:
                 # First character cannot be an operator
@@ -61,7 +57,7 @@ class CalcApp(App):
                 new_text = current + button_text
                 self.solution.text = new_text
         self.last_button = button_text
-        self.last_operator = self.last_button in self.operators
+        self.last_was_operator = self.last_button in self.operators
 
     def on_solution(self, instance):
         text = self.solution.text
@@ -71,5 +67,5 @@ class CalcApp(App):
 
 
 if __name__ == "__main__":
-    app = CalcApp()
+    app = MainApp()
     app.run()
